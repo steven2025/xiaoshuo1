@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>竹青书斋 V4 · 多作者AI小说平台</title>
+  <title>竹青书斋 · AI小说创作与阅读平台</title>
   <style>
     :root{
       --bg0:#071a12;
@@ -103,16 +103,16 @@
   <div class="auth-card">
     <section class="hero">
       <div>
-        <h1>🎋 竹青书斋 V4<br/>多作者 AI 小说平台</h1>
-        <p>本版本把前端拆分为作者端与读者端：作者通过邀请码登录并上传作品；读者注册登录后进入书库，按作者、名称、类型检索并阅读小说。所有权限校验、BOS读写和 DeepSeek API 调用均建议由百度云函数完成。</p>
+        <h1>🎋 竹青书斋<br/>AI小说创作与阅读平台</h1>
+        <p>一个面向原创作者与读者的小说平台。作者可通过邀请加入创作空间，发布作品、更新章节并使用AI辅助梳理内容；读者可注册登录，检索作品、沉浸阅读并保存阅读进度。</p>
         <div class="feature-grid">
-          <div class="feature"><b>👨‍💻 作者端</b><span>邀请码登录、创建小说、上传章节、AI生成摘要与人物线索分析。</span></div>
-          <div class="feature"><b>📖 读者端</b><span>注册登录、分类检索、阅读器、阅读进度、继续阅读。</span></div>
-          <div class="feature"><b>☁️ 百度云架构</b><span>前端 → 云函数 → BOS对象存储，前端不直接暴露邀请码与API密钥。</span></div>
-          <div class="feature"><b>🤖 DeepSeek能力</b><span>通过云函数安全调用大模型，用于章节摘要、类型标注、内容分析。</span></div>
+          <div class="feature"><b>✍️ 创作空间</b><span>邀请制作者入驻、创建作品、上传章节、AI摘要与人物线索梳理。</span></div>
+          <div class="feature"><b>📖 阅读空间</b><span>注册登录、分类检索、沉浸式阅读、阅读进度与继续阅读。</span></div>
+          <div class="feature"><b>🌿 云端书库</b><span>作品统一进入云端书库，支持多作者发布、分类管理与稳定阅读。</span></div>
+          <div class="feature"><b>🤖 AI创作助手</b><span>辅助生成章节摘要、人物线索、作品标签与内容导读。</span></div>
         </div>
       </div>
-      <div class="muted">建议部署：BOS 静态网站托管 + 百度云函数 CFC + BOS 私有读写 + DeepSeek API。</div>
+      <div class="muted">为作者提供轻量创作发布空间，为读者提供清爽、连贯、沉浸的阅读体验。</div>
     </section>
 
     <section class="login-box">
@@ -124,7 +124,7 @@
 
       <div class="auth-form active" id="authorLogin">
         <h2>作者登录</h2>
-        <p>只有获得邀请码的作者可以登录。邀请码请由云函数从 BOS 读取并校验，不建议前端直接读取邀请码文件。</p>
+        <p>仅受邀作者可以进入创作空间。请输入作者名称和邀请码，验证通过后即可管理自己的作品。</p>
         <div class="field"><label>作者名称</label><input id="authorName" placeholder="请输入作者名称" /></div>
         <div class="field"><label>邀请码</label><input id="inviteCode" placeholder="请输入邀请码" /></div>
         <button class="primary" onclick="loginAuthor()">进入作者工作台</button>
@@ -140,7 +140,7 @@
 
       <div class="auth-form" id="readerRegister">
         <h2>读者注册</h2>
-        <p>注册信息提交给云函数，后端负责密码哈希、用户索引写入 BOS 或数据库。</p>
+        <p>注册后可进入书库、阅读作品、保存进度，并在后续版本中使用收藏与阅读历史。</p>
         <div class="field"><label>读者昵称</label><input id="readerRegName" placeholder="如：竹青读者001" /></div>
         <div class="field"><label>密码</label><input id="readerRegPassword" type="password" placeholder="至少6位" /></div>
         <div class="field"><label>确认密码</label><input id="readerRegPassword2" type="password" placeholder="再次输入密码" /></div>
@@ -148,8 +148,8 @@
       </div>
 
       <div class="panel" style="margin:0">
-        <h3>接口约定</h3>
-        <p class="muted">前端已预留 action：authorLogin、readerLogin、readerRegister、listPublicBooks、listMyBooks、createBook、addChapter、getBook、saveProgress、aiSummarizeChapter、aiAnalyzeChapter。</p>
+        <h3>平台说明</h3>
+        <p class="muted">作者通过邀请加入平台，读者注册后即可阅读。平台支持作品发布、章节更新、分类检索、AI辅助分析和沉浸式阅读。</p>
       </div>
     </section>
   </div>
@@ -159,22 +159,22 @@
 <div class="app hidden" id="appShell">
   <aside class="sidebar">
     <div class="brand">
-      <h1>🎋 竹青书斋 V4</h1>
-      <p>多作者上传、云端书库、读者阅读与AI分析平台。</p>
+      <h1>🎋 竹青书斋</h1>
+      <p>原创小说创作、上传、分享与沉浸阅读平台。</p>
     </div>
 
     <div class="user-card">
       <b id="userNameText">未登录</b>
       <span id="roleText">身份：-</span><br/>
-      <span id="tokenText">Token：-</span>
+      <span id="tokenText">登录状态：-</span>
     </div>
 
     <div class="nav" id="navButtons"></div>
 
     <div class="status">
-      <div>云函数地址：</div>
-      <div id="apiStatus">未配置</div>
-      <div style="margin-top:8px">运行模式：<b id="modeText">百度云函数 + BOS + DeepSeek</b></div>
+      <div>平台状态：</div>
+      <div id="apiStatus">在线服务</div>
+      <div style="margin-top:8px">当前空间：<b id="modeText">云端书斋</b></div>
       <div class="row" style="margin-top:12px"><button class="danger" onclick="logout()">退出登录</button></div>
     </div>
   </aside>
@@ -183,7 +183,7 @@
     <div class="topbar">
       <div class="topbar-title" id="pageTitle">总览看板</div>
       <div class="topbar-actions" id="topbarActions">
-        <button onclick="refreshAll()">🔄 同步云端</button>
+        <button onclick="refreshAll()">🔄 刷新书库</button>
         <button class="primary author-only" onclick="openModal('bookModal')">➕ 创建小说</button>
       </div>
     </div>
@@ -198,9 +198,9 @@
         </div>
         <div class="panel">
           <h2>✨ 平台能力</h2>
-          <p class="muted" id="dashboardIntro">V4 已加入作者/读者双入口、权限隔离、分类检索和带 token 的云函数接口。</p>
+          <p class="muted" id="dashboardIntro">欢迎来到竹青书斋。这里支持作者发布原创作品，也支持读者按作者、书名、类型和标签发现小说。</p>
           <div class="row">
-            <span class="badge ok">作者邀请码</span><span class="badge ok">读者注册登录</span><span class="badge ok">BOS云存储</span><span class="badge ok">云函数鉴权</span><span class="badge ok">DeepSeek分析</span><span class="badge ok">阅读进度</span>
+            <span class="badge ok">邀请制作者</span><span class="badge ok">读者书库</span><span class="badge ok">分类检索</span><span class="badge ok">章节管理</span><span class="badge ok">AI辅助分析</span><span class="badge ok">阅读进度</span>
           </div>
         </div>
         <div class="panel">
@@ -224,7 +224,7 @@
 
       <section class="view" id="authorWorks">
         <div class="panel">
-          <div class="row between"><div><h2>🧑‍💻 我的作品</h2><p class="muted">仅作者可见。后端应根据 token 返回当前作者自己的作品。</p></div><button class="primary" onclick="openModal('bookModal')">创建小说</button></div>
+          <div class="row between"><div><h2>🧑‍💻 我的作品</h2><p class="muted">仅作者可见。这里集中展示和管理你发布的原创作品。</p></div><button class="primary" onclick="openModal('bookModal')">创建小说</button></div>
         </div>
         <div id="myBookGrid" class="grid"></div>
       </section>
@@ -232,12 +232,12 @@
       <section class="view" id="upload">
         <div class="panel">
           <h2>📤 作者上传 / 新增章节</h2>
-          <p class="muted">上传时会携带 author token。云函数应校验作者身份，并确认该作者拥有当前作品的管理权限。</p>
+          <p class="muted">在这里为自己的作品新增章节。保存后，读者即可在书库中阅读更新内容。</p>
           <div class="form-grid">
             <div><label>选择小说</label><select id="chapterBookSelect"></select></div>
             <div><label>章节名称</label><input id="chapterName" placeholder="如：第一章 竹影" /></div>
           </div>
-          <div style="margin-top:14px"><label>章节正文</label><textarea id="chapterContent" placeholder="粘贴章节正文，或由后端扩展为文件上传到 BOS..."></textarea></div>
+          <div style="margin-top:14px"><label>章节正文</label><textarea id="chapterContent" placeholder="请粘贴章节正文..."></textarea></div>
           <div class="row" style="margin-top:14px"><button class="primary" onclick="addChapter()">保存章节</button><button onclick="clearChapterForm()">清空</button></div>
         </div>
       </section>
@@ -245,34 +245,26 @@
       <section class="view" id="readerHome">
         <div class="panel">
           <h2>📌 我的阅读</h2>
-          <p class="muted">这里预留阅读历史、收藏、继续阅读。当前前端先从 localStorage 读取最近阅读记录，后续可改为云函数读取。</p>
+          <p class="muted">这里会展示你的最近阅读记录，方便继续阅读喜欢的作品。</p>
           <div id="readingHistory" class="grid"></div>
         </div>
       </section>
 
       <section class="view" id="settings">
         <div class="panel">
-          <h2>⚙️ 前端API配置</h2>
-          <p class="muted">打开本文件，找到下面这一行，将百度云函数公网地址替换进去：</p>
-          <pre>const API_BASE = "https://7fp039tr9rtgx.cfc-execute.gz.baidubce.com/xiaoshuo1";</pre>
+          <h2>🌿 关于竹青书斋</h2>
+          <p class="muted">竹青书斋面向原创作者与读者，提供从作品发布、章节管理到AI阅读辅助的一体化体验。</p>
+          <div class="row"><span class="badge ok">原创发布</span><span class="badge ok">作品分享</span><span class="badge ok">沉浸阅读</span><span class="badge ok">AI导读</span></div>
         </div>
         <div class="panel">
-          <h2>🔐 权限与邀请码建议</h2>
-          <pre>1. 前端不要直接读取邀请码文件。
-2. 前端提交 authorName + inviteCode 给云函数。
-3. 云函数从 BOS 读取 invite-codes.json 并校验。
-4. 校验通过后返回 authorToken。
-5. createBook / addChapter / listMyBooks 等作者接口必须携带 token。
-6. DeepSeek API Key 只放在云函数环境变量，不放在前端。</pre>
+          <h2>✍️ 作者服务</h2>
+          <p class="muted">作者通过邀请进入创作空间后，可以创建小说、维护作品简介、持续更新章节，并使用AI辅助生成章节摘要、人物线索和内容标签。</p>
+          <div class="row"><span class="badge">创建小说</span><span class="badge">上传章节</span><span class="badge">作品管理</span><span class="badge">AI辅助创作</span></div>
         </div>
         <div class="panel">
-          <h2>🤖 后端环境变量建议</h2>
-          <pre>AI_API_URL=https://api.deepseek.com/v1/chat/completions
-AI_API_KEY=你的DeepSeek密钥
-AI_MODEL=deepseek-chat
-BOS_BUCKET=你的BOS桶名
-BOS_REGION=你的区域
-JWT_SECRET=用于签发作者/读者token的密钥</pre>
+          <h2>📖 读者服务</h2>
+          <p class="muted">读者可以通过书名、作者、类型和标签发现作品，在阅读器中调整字号、切换夜间模式，并保存阅读进度。平台也会通过AI摘要帮助读者快速了解章节内容。</p>
+          <div class="row"><span class="badge">分类检索</span><span class="badge">继续阅读</span><span class="badge">夜间模式</span><span class="badge">章节摘要</span></div>
         </div>
       </section>
 
@@ -329,7 +321,7 @@ JWT_SECRET=用于签发作者/读者token的密钥</pre>
 /**********************
  * 1. 基础配置
  **********************/
-const API_BASE = "https://7fp039tr9rtgx.cfc-execute.gz.baidubce.com/xiaoshuo1"; // 百度云函数公网地址
+const API_BASE = "https://7fp039tr9rtgx.cfc-execute.gz.baidubce.com/xiaoshuo1";
 const STORAGE_KEY = "zhuqing_v4_session";
 const HISTORY_KEY = "zhuqing_v4_reading_history";
 
@@ -339,7 +331,7 @@ let currentBook = null;
 let currentChapterIndex = 0;
 let currentUser = null; // { role:'author'|'reader', name, id, token }
 
-document.getElementById("apiStatus").textContent = API_BASE.includes("你的百度云函数") ? "请先替换 API_BASE" : API_BASE;
+document.getElementById("apiStatus").textContent = "在线服务";
 
 /**********************
  * 2. 登录页切换
@@ -358,7 +350,7 @@ document.querySelectorAll("[data-auth-tab]").forEach(btn=>{
  **********************/
 async function api(action, payload={}, method="POST"){
   if(API_BASE.includes("你的百度云函数")){
-    console.warn("当前未配置真实 API_BASE，前端将使用本地演示数据。action=", action);
+    console.warn("当前服务暂不可用，已进入预览模式。", action);
     return mockApi(action, payload);
   }
   const token = currentUser?.token || "";
@@ -459,7 +451,7 @@ function restoreSession(){
 function renderUser(){
   document.getElementById("userNameText").textContent = currentUser?.name || "未登录";
   document.getElementById("roleText").textContent = "身份：" + (currentUser?.role === "author" ? "作者" : "读者");
-  document.getElementById("tokenText").textContent = "Token：" + maskToken(currentUser?.token || "-");
+  document.getElementById("tokenText").textContent = "登录状态：已认证";
   document.querySelectorAll(".author-only").forEach(el=>el.classList.toggle("hidden", currentUser?.role !== "author"));
 }
 
@@ -476,7 +468,7 @@ function renderNav(){
   const common = [{id:"dashboard", label:"🏠 总览看板"},{id:"books", label:"📚 小说书库"}];
   const author = [{id:"authorWorks", label:"🧑‍💻 我的作品"},{id:"upload", label:"📤 上传/新增"}];
   const reader = [{id:"readerHome", label:"📌 我的阅读"}];
-  const tail = [{id:"settings", label:"⚙️ API配置说明"}];
+  const tail = [{id:"settings", label:"🌿 平台介绍"}];
   const items = currentUser?.role === "author" ? [...common, ...author, ...tail] : [...common, ...reader, ...tail];
   nav.innerHTML = items.map((n,i)=>`<button class="${i===0?'active':''}" data-view="${n.id}">${n.label}</button>`).join("");
   nav.querySelectorAll("button").forEach(btn=>{
@@ -492,7 +484,7 @@ function showView(id){
   document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
   const target = document.getElementById(id);
   if(target) target.classList.add("active");
-  const nameMap = {dashboard:"总览看板",books:"小说书库",authorWorks:"我的作品",readerHome:"我的阅读",upload:"上传/新增",settings:"API配置说明",readerView:"阅读器",chapterView:"小说目录"};
+  const nameMap = {dashboard:"总览看板",books:"小说书库",authorWorks:"我的作品",readerHome:"我的阅读",upload:"上传/新增",settings:"平台介绍",readerView:"阅读器",chapterView:"小说目录"};
   document.getElementById("pageTitle").textContent = nameMap[id] || "竹青书斋";
   document.querySelectorAll("#navButtons button").forEach(b=>b.classList.toggle("active", b.dataset.view === id));
   if(id === "readerHome") renderReadingHistory();
@@ -503,12 +495,12 @@ function showView(id){
  **********************/
 async function refreshAll(){
   try{
-    toast("正在同步云端...");
+    toast("正在刷新书库...");
     books = await api("listPublicBooks", {}, "GET");
     if(currentUser?.role === "author") myBooks = await api("listMyBooks", {}, "GET");
     else myBooks = [];
     renderAll();
-    toast("同步完成");
+    toast("书库已更新");
   }catch(e){ console.error(e); toast(e.message); }
 }
 
@@ -754,8 +746,7 @@ function escapeHtml(str){ return String(str ?? "").replace(/[&<>"']/g, s => ({"&
 function escapeAttr(str){ return escapeHtml(str).replace(/`/g,"&#96;"); }
 
 /**********************
- * 11. 本地演示数据：未配置API时可直接预览
- * 实际部署时由百度云函数返回真实数据
+ * 11. 预览数据：服务暂不可用时用于页面展示
  **********************/
 const demoBooks = [
   {id:"book_demo_001",title:"竹影春秋",author:"鄢清华",authorId:"author_demo",type:"历史",tags:["权谋","成长"],description:"一部以竹林书院为背景的历史成长小说。",chapterCount:2,wordCount:1680,createdAt:Date.now()-86400000*6,updatedAt:Date.now()-3600000,chapters:[{name:"第一章 竹影",content:"夜色落在竹青书斋的屋檐上，风从山口吹来，像有人翻动一册旧书。\n\n少年推门而入，看见案头的灯还亮着。先生没有抬头，只问：你可知道，真正的路从来不是别人指出来的？"},{name:"第二章 春秋",content:"第二日清晨，山下传来急报。城中旧案重启，许多人的名字重新浮出水面。\n\n少年第一次明白，书斋之外的世界，比纸上的春秋更复杂。"}]},
@@ -794,7 +785,7 @@ async function mockApi(action, payload){
     const b = all.find(x=>x.id===payload.bookId); if(!b) throw new Error("未找到小说"); return b;
   }
   if(action === "saveProgress") return {ok:true};
-  if(action === "aiSummarizeChapter") return {result:`【演示摘要】本章《${payload.chapterName}》主要推动了故事情节，呈现人物处境与关键冲突。真实部署后，这里由云函数调用 DeepSeek API 返回。`};
+  if(action === "aiSummarizeChapter") return {result:`【演示摘要】本章《${payload.chapterName}》主要推动了故事情节，呈现人物处境与关键冲突。平台会生成更完整的章节导读。`};
   if(action === "aiAnalyzeChapter") return {result:"【演示分析】人物：主角、先生/管理者。线索：书斋、旧案、信号或组织变化。情绪：悬念、成长、转折。"};
   throw new Error("未知操作 action=" + action);
 }
