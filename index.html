@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>竹青书斋 V4 · 多作者AI小说平台</title>
+  <style>
+    :root{
+      --bg0:#071a12;
+      --bg1:#123623;
+      --bg2:#245f3d;
+      --card:rgba(255,255,255,.10);
+      --card2:rgba(255,255,255,.16);
+      --line:rgba(255,255,255,.16);
+      --text:#effaf2;
+      --muted:#b9d8c2;
+      --primary:#61c981;
+      --primary2:#9be7ad;
+      --accent:#ffd166;
+      --danger:#ff7b7b;
+      --reader-bg:#f5f1e7;
+      --reader-text:#2a2118;
+      --shadow:0 24px 80px rgba(0,0,0,.30);
+      --radius:24px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Inter","PingFang SC","Microsoft YaHei",Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(111,210,142,.28), transparent 32%),
+        radial-gradient(circle at 85% 8%, rgba(255,209,102,.15), transparent 28%),
+        linear-gradient(135deg,var(--bg0),var(--bg1) 45%,var(--bg2));
+      overflow:hidden;
+    }
+    button,input,textarea,select{font:inherit}
+    button{
+      border:0;border-radius:999px;padding:10px 16px;cursor:pointer;transition:.18s ease;
+      color:var(--text);background:var(--card2);border:1px solid var(--line);
+    }
+    button:hover{transform:translateY(-1px);background:rgba(255,255,255,.22)}
+    button.primary{background:linear-gradient(135deg,var(--primary),#3aa861);color:#082112;border:0;font-weight:800}
+    button.accent{background:linear-gradient(135deg,var(--accent),#e6a832);color:#211606;border:0;font-weight:800}
+    button.ghost{background:transparent}
+    button.danger{background:rgba(255,123,123,.16);border-color:rgba(255,123,123,.35);color:#ffe0e0}
+    button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+    input,textarea,select{
+      width:100%;border:1px solid rgba(255,255,255,.16);background:rgba(5,20,12,.38);
+      color:var(--text);border-radius:16px;padding:12px 14px;outline:none;
+    }
+    select option{background:#163723;color:#effaf2}
+    textarea{min-height:180px;resize:vertical;line-height:1.7}
+    input:focus,textarea:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(97,201,129,.14)}
+    .hidden{display:none!important}
+    .auth-screen{min-height:100%;display:flex;align-items:center;justify-content:center;padding:22px}
+    .auth-card{width:min(1080px,100%);display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:stretch}
+    .hero,.login-box{background:rgba(255,255,255,.09);border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(18px);border-radius:32px;overflow:hidden}
+    .hero{padding:34px;position:relative;min-height:620px;display:flex;flex-direction:column;justify-content:space-between}
+    .hero:before{content:"";position:absolute;inset:auto -80px -90px auto;width:320px;height:320px;border-radius:50%;background:rgba(97,201,129,.18);filter:blur(2px)}
+    .hero h1{font-size:42px;line-height:1.15;margin:0 0 16px;letter-spacing:1px}
+    .hero p{color:var(--muted);font-size:16px;line-height:1.8;margin:0;max-width:720px}
+    .feature-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:28px}
+    .feature{background:rgba(255,255,255,.10);border:1px solid var(--line);border-radius:22px;padding:16px;min-height:104px}
+    .feature b{display:block;margin-bottom:8px;font-size:17px}.feature span{color:var(--muted);line-height:1.55;font-size:13px}
+    .login-box{padding:22px;display:flex;flex-direction:column;gap:16px}
+    .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;background:rgba(0,0,0,.18);padding:8px;border-radius:22px}
+    .tabs button{border-radius:16px;background:transparent;text-align:center;padding:12px 8px}
+    .tabs button.active{background:rgba(97,201,129,.24);border-color:rgba(97,201,129,.55)}
+    .auth-form{display:none;animation:fade .2s ease}.auth-form.active{display:block}
+    .auth-form h2{margin:4px 0 8px}.auth-form p{margin:0 0 18px;color:var(--muted);line-height:1.6;font-size:14px}
+    .field{margin-bottom:14px} label{display:block;color:var(--muted);font-size:13px;margin:0 0 8px}
+    .app{height:100%;display:grid;grid-template-columns:292px 1fr;gap:18px;padding:18px}
+    .sidebar,.main{background:rgba(255,255,255,.08);border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(18px);border-radius:var(--radius);overflow:hidden}
+    .sidebar{display:flex;flex-direction:column}.brand{padding:22px;border-bottom:1px solid var(--line)}
+    .brand h1{margin:0;font-size:24px;letter-spacing:1px}.brand p{margin:8px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
+    .user-card{margin:14px;padding:14px;border:1px solid var(--line);background:rgba(255,255,255,.08);border-radius:20px}
+    .user-card b{display:block;font-size:16px;margin-bottom:6px}.user-card span{color:var(--muted);font-size:12px;line-height:1.5}
+    .nav{padding:0 14px 14px;display:grid;gap:10px}.nav button{text-align:left;border-radius:18px;padding:14px 16px}.nav button.active{background:rgba(97,201,129,.22);border-color:rgba(97,201,129,.55)}
+    .status{margin-top:auto;padding:16px 18px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);line-height:1.7}
+    .main{display:flex;flex-direction:column;min-width:0}.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line);gap:14px}
+    .topbar-title{font-weight:900;font-size:20px}.topbar-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.content{padding:18px;overflow:auto;height:100%}
+    .view{display:none;animation:fade .22s ease}.view.active{display:block}@keyframes fade{from{opacity:.3;transform:translateY(6px)}to{opacity:1;transform:none}}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.stat{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px}.stat b{display:block;font-size:26px;margin-bottom:6px}.stat span{color:var(--muted);font-size:13px}
+    .toolbar{display:grid;grid-template-columns:1.3fr .8fr .8fr .8fr auto;gap:10px;margin-bottom:16px;align-items:center}.toolbar.compact{display:flex;flex-wrap:wrap}.toolbar .search{min-width:220px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}.book{position:relative;min-height:250px;padding:16px;background:linear-gradient(155deg,rgba(255,255,255,.16),rgba(255,255,255,.06));border:1px solid var(--line);border-radius:24px;overflow:hidden;cursor:pointer;transition:.2s ease}.book:hover{transform:translateY(-4px);box-shadow:0 18px 50px rgba(0,0,0,.24);border-color:rgba(97,201,129,.55)}
+    .cover{width:86px;height:116px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;background:linear-gradient(135deg,#e9f8df,#85c28f);color:#16351f;font-size:38px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.55),0 10px 24px rgba(0,0,0,.20);overflow:hidden}.cover img{width:100%;height:100%;object-fit:cover}
+    .book h3{font-size:17px;margin:0 0 8px;line-height:1.35}.book p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.12);color:var(--muted);font-size:12px;margin-top:10px}.badge.ok{background:rgba(97,201,129,.18);color:#dfffe7}.badge.warn{background:rgba(255,209,102,.18);color:#ffedb0}
+    .panel{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:18px;margin-bottom:16px}.panel h2,.panel h3{margin:0 0 14px}.muted{color:var(--muted)}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.form-grid.three{grid-template-columns:1fr 1fr 1fr}.divider{height:1px;background:var(--line);margin:16px 0}.empty{padding:26px;border:1px dashed rgba(255,255,255,.22);border-radius:22px;color:var(--muted);text-align:center}
+    .chapters{display:grid;gap:10px}.chapter{display:flex;justify-content:space-between;gap:12px;align-items:center;background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:18px;padding:14px 16px;cursor:pointer}.chapter:hover{border-color:rgba(97,201,129,.55)}
+    .reader-shell{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;height:calc(100vh - 132px)}.reader{background:var(--reader-bg);color:var(--reader-text);border-radius:26px;padding:0;overflow:hidden;box-shadow:var(--shadow)}.reader-head{padding:18px 22px;border-bottom:1px solid rgba(0,0,0,.08);display:flex;justify-content:space-between;gap:12px;align-items:center}.reader-head h2{margin:0;font-size:21px;color:var(--reader-text)}.reader-body{height:calc(100% - 72px);overflow:auto;padding:26px 34px;font-family:"LXGW WenKai","Songti SC","SimSun",serif;font-size:20px;line-height:2.05;text-align:justify}.reader-body p{text-indent:2em;margin:0 0 18px}.reader.dark{background:#101713;color:#dcebdc}.reader.dark .reader-head h2,.reader.dark{color:#dcebdc}.reader.dark .reader-head{border-color:rgba(255,255,255,.1)}
+    .ai-card{background:rgba(255,255,255,.10);border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:14px}.ai-card h3{margin:0 0 10px}.ai-output{white-space:pre-wrap;color:#e8f5e9;line-height:1.7;font-size:14px;max-height:240px;overflow:auto}.reader .reader-head button{color:#2a2118;background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.12)}.reader.dark .reader-head button{color:#dcebdc;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}
+    .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:rgba(0,0,0,.72);color:white;padding:12px 18px;border-radius:999px;display:none;z-index:50}.toast.show{display:block}.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:40;padding:18px}.modal-mask.show{display:flex}.modal{width:min(820px,100%);max-height:90vh;overflow:auto;background:#183723;border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);padding:20px}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.modal-head h2{margin:0}pre{white-space:pre-wrap;background:rgba(0,0,0,.25);padding:14px;border-radius:16px;line-height:1.6;overflow:auto}
+    @media(max-width:1080px){.auth-card{grid-template-columns:1fr}.hero{min-height:auto}.toolbar{grid-template-columns:1fr 1fr}.toolbar button{width:100%}}
+    @media(max-width:960px){body{overflow:auto}.app{height:auto;min-height:100%;grid-template-columns:1fr;padding:12px}.sidebar{position:relative}.stats{grid-template-columns:repeat(2,1fr)}.reader-shell{grid-template-columns:1fr;height:auto}.reader{height:72vh}.form-grid,.form-grid.three{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.auth-screen{align-items:flex-start}.feature-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<!-- 登录入口 -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-card">
+    <section class="hero">
+      <div>
+        <h1>🎋 竹青书斋 V4<br/>多作者 AI 小说平台</h1>
+        <p>本版本把前端拆分为作者端与读者端：作者通过邀请码登录并上传作品；读者注册登录后进入书库，按作者、名称、类型检索并阅读小说。所有权限校验、BOS读写和 DeepSeek API 调用均建议由百度云函数完成。</p>
+        <div class="feature-grid">
+          <div class="feature"><b>👨‍💻 作者端</b><span>邀请码登录、创建小说、上传章节、AI生成摘要与人物线索分析。</span></div>
+          <div class="feature"><b>📖 读者端</b><span>注册登录、分类检索、阅读器、阅读进度、继续阅读。</span></div>
+          <div class="feature"><b>☁️ 百度云架构</b><span>前端 → 云函数 → BOS对象存储，前端不直接暴露邀请码与API密钥。</span></div>
+          <div class="feature"><b>🤖 DeepSeek能力</b><span>通过云函数安全调用大模型，用于章节摘要、类型标注、内容分析。</span></div>
+        </div>
+      </div>
+      <div class="muted">建议部署：BOS 静态网站托管 + 百度云函数 CFC + BOS 私有读写 + DeepSeek API。</div>
+    </section>
+
+    <section class="login-box">
+      <div class="tabs">
+        <button class="active" data-auth-tab="authorLogin">作者登录</button>
+        <button data-auth-tab="readerLogin">读者登录</button>
+        <button data-auth-tab="readerRegister">读者注册</button>
+      </div>
+
+      <div class="auth-form active" id="authorLogin">
+        <h2>作者登录</h2>
+        <p>只有获得邀请码的作者可以登录。邀请码请由云函数从 BOS 读取并校验，不建议前端直接读取邀请码文件。</p>
+        <div class="field"><label>作者名称</label><input id="authorName" placeholder="请输入作者名称" /></div>
+        <div class="field"><label>邀请码</label><input id="inviteCode" placeholder="请输入邀请码" /></div>
+        <button class="primary" onclick="loginAuthor()">进入作者工作台</button>
+      </div>
+
+      <div class="auth-form" id="readerLogin">
+        <h2>读者登录</h2>
+        <p>登录后可进入书库、收藏作品、保存阅读进度。</p>
+        <div class="field"><label>账号</label><input id="readerLoginName" placeholder="请输入读者账号" /></div>
+        <div class="field"><label>密码</label><input id="readerLoginPassword" type="password" placeholder="请输入密码" /></div>
+        <button class="primary" onclick="loginReader()">进入读者书库</button>
+      </div>
+
+      <div class="auth-form" id="readerRegister">
+        <h2>读者注册</h2>
+        <p>注册信息提交给云函数，后端负责密码哈希、用户索引写入 BOS 或数据库。</p>
+        <div class="field"><label>读者昵称</label><input id="readerRegName" placeholder="如：竹青读者001" /></div>
+        <div class="field"><label>密码</label><input id="readerRegPassword" type="password" placeholder="至少6位" /></div>
+        <div class="field"><label>确认密码</label><input id="readerRegPassword2" type="password" placeholder="再次输入密码" /></div>
+        <button class="accent" onclick="registerReader()">注册并登录</button>
+      </div>
+
+      <div class="panel" style="margin:0">
+        <h3>接口约定</h3>
+        <p class="muted">前端已预留 action：authorLogin、readerLogin、readerRegister、listPublicBooks、listMyBooks、createBook、addChapter、getBook、saveProgress、aiSummarizeChapter、aiAnalyzeChapter。</p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- 应用主体 -->
+<div class="app hidden" id="appShell">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>🎋 竹青书斋 V4</h1>
+      <p>多作者上传、云端书库、读者阅读与AI分析平台。</p>
+    </div>
+
+    <div class="user-card">
+      <b id="userNameText">未登录</b>
+      <span id="roleText">身份：-</span><br/>
+      <span id="tokenText">Token：-</span>
+    </div>
+
+    <div class="nav" id="navButtons"></div>
+
+    <div class="status">
+      <div>云函数地址：</div>
+      <div id="apiStatus">未配置</div>
+      <div style="margin-top:8px">运行模式：<b id="modeText">百度云函数 + BOS + DeepSeek</b></div>
+      <div class="row" style="margin-top:12px"><button class="danger" onclick="logout()">退出登录</button></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="pageTitle">总览看板</div>
+      <div class="topbar-actions" id="topbarActions">
+        <button onclick="refreshAll()">🔄 同步云端</button>
+        <button class="primary author-only" onclick="openModal('bookModal')">➕ 创建小说</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <section class="view active" id="dashboard">
+        <div class="stats">
+          <div class="stat"><b id="statBooks">0</b><span id="statBooksLabel">云端小说</span></div>
+          <div class="stat"><b id="statChapters">0</b><span>总章节数</span></div>
+          <div class="stat"><b id="statWords">0</b><span>估算字数</span></div>
+          <div class="stat"><b id="statUpdated">-</b><span>最近更新</span></div>
+        </div>
+        <div class="panel">
+          <h2>✨ 平台能力</h2>
+          <p class="muted" id="dashboardIntro">V4 已加入作者/读者双入口、权限隔离、分类检索和带 token 的云函数接口。</p>
+          <div class="row">
+            <span class="badge ok">作者邀请码</span><span class="badge ok">读者注册登录</span><span class="badge ok">BOS云存储</span><span class="badge ok">云函数鉴权</span><span class="badge ok">DeepSeek分析</span><span class="badge ok">阅读进度</span>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="row between"><h2>🕘 最近书籍</h2><button onclick="showView('books')">查看全部</button></div>
+          <div id="recentBooks" class="grid"></div>
+        </div>
+      </section>
+
+      <section class="view" id="books">
+        <div class="toolbar">
+          <input class="search" id="searchInput" placeholder="搜索书名 / 作者 / 类型 / 标签" oninput="renderBooks()" />
+          <select id="authorFilter" onchange="renderBooks()"><option value="">全部作者</option></select>
+          <select id="typeFilter" onchange="renderBooks()"><option value="">全部类型</option></select>
+          <select id="sortSelect" onchange="renderBooks()">
+            <option value="updatedAt">按更新时间</option><option value="createdAt">按创建时间</option><option value="title">按书名</option><option value="author">按作者</option><option value="type">按类型</option>
+          </select>
+          <button onclick="clearFilters()">清空筛选</button>
+        </div>
+        <div id="bookGrid" class="grid"></div>
+      </section>
+
+      <section class="view" id="authorWorks">
+        <div class="panel">
+          <div class="row between"><div><h2>🧑‍💻 我的作品</h2><p class="muted">仅作者可见。后端应根据 token 返回当前作者自己的作品。</p></div><button class="primary" onclick="openModal('bookModal')">创建小说</button></div>
+        </div>
+        <div id="myBookGrid" class="grid"></div>
+      </section>
+
+      <section class="view" id="upload">
+        <div class="panel">
+          <h2>📤 作者上传 / 新增章节</h2>
+          <p class="muted">上传时会携带 author token。云函数应校验作者身份，并确认该作者拥有当前作品的管理权限。</p>
+          <div class="form-grid">
+            <div><label>选择小说</label><select id="chapterBookSelect"></select></div>
+            <div><label>章节名称</label><input id="chapterName" placeholder="如：第一章 竹影" /></div>
+          </div>
+          <div style="margin-top:14px"><label>章节正文</label><textarea id="chapterContent" placeholder="粘贴章节正文，或由后端扩展为文件上传到 BOS..."></textarea></div>
+          <div class="row" style="margin-top:14px"><button class="primary" onclick="addChapter()">保存章节</button><button onclick="clearChapterForm()">清空</button></div>
+        </div>
+      </section>
+
+      <section class="view" id="readerHome">
+        <div class="panel">
+          <h2>📌 我的阅读</h2>
+          <p class="muted">这里预留阅读历史、收藏、继续阅读。当前前端先从 localStorage 读取最近阅读记录，后续可改为云函数读取。</p>
+          <div id="readingHistory" class="grid"></div>
+        </div>
+      </section>
+
+      <section class="view" id="settings">
+        <div class="panel">
+          <h2>⚙️ 前端API配置</h2>
+          <p class="muted">打开本文件，找到下面这一行，将百度云函数公网地址替换进去：</p>
+          <pre>const API_BASE = "https://7fp039tr9rtgx.cfc-execute.gz.baidubce.com/xiaoshuo1";</pre>
+        </div>
+        <div class="panel">
+          <h2>🔐 权限与邀请码建议</h2>
+          <pre>1. 前端不要直接读取邀请码文件。
+2. 前端提交 authorName + inviteCode 给云函数。
+3. 云函数从 BOS 读取 invite-codes.json 并校验。
+4. 校验通过后返回 authorToken。
+5. createBook / addChapter / listMyBooks 等作者接口必须携带 token。
+6. DeepSeek API Key 只放在云函数环境变量，不放在前端。</pre>
+        </div>
+        <div class="panel">
+          <h2>🤖 后端环境变量建议</h2>
+          <pre>AI_API_URL=https://api.deepseek.com/v1/chat/completions
+AI_API_KEY=你的DeepSeek密钥
+AI_MODEL=deepseek-chat
+BOS_BUCKET=你的BOS桶名
+BOS_REGION=你的区域
+JWT_SECRET=用于签发作者/读者token的密钥</pre>
+        </div>
+      </section>
+
+      <section class="view" id="readerView">
+        <div class="reader-shell">
+          <div class="reader" id="readerBox">
+            <div class="reader-head">
+              <h2 id="readerChapterTitle">章节标题</h2>
+              <div class="row"><button onclick="prevChapter()">上一章</button><button onclick="nextChapter()">下一章</button><button onclick="toggleReaderTheme()">夜间</button></div>
+            </div>
+            <div class="reader-body" id="readerBody"></div>
+          </div>
+          <aside>
+            <div class="ai-card"><h3>🤖 AI章节摘要</h3><button class="primary" onclick="aiSummarize()">生成摘要</button><div class="ai-output" id="summaryOutput">点击按钮后生成。</div></div>
+            <div class="ai-card"><h3>🧑‍🤝‍🧑 人物/线索分析</h3><button onclick="aiAnalyze()">分析本章</button><div class="ai-output" id="analysisOutput">点击按钮后生成。</div></div>
+            <div class="ai-card"><h3>📖 阅读设置</h3><label>字号</label><input type="range" min="16" max="28" value="20" oninput="setFontSize(this.value)" /><div class="row" style="margin-top:12px"><button onclick="saveProgress()">保存进度</button><button onclick="backToChapters()">返回目录</button></div></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view" id="chapterView">
+        <div class="panel">
+          <div class="row between">
+            <div><h2 id="chapterBookTitle">目录</h2><p class="muted" id="chapterBookMeta"></p></div>
+            <div class="row"><button onclick="showView('books')">返回书库</button><button class="primary author-only" onclick="prepareAddChapterForCurrent()">新增章节</button></div>
+          </div>
+        </div>
+        <div id="chapterList" class="chapters"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- 创建小说 -->
+<div class="modal-mask" id="bookModal">
+  <div class="modal">
+    <div class="modal-head"><h2>创建小说</h2><button onclick="closeModal('bookModal')">✕</button></div>
+    <div class="form-grid">
+      <div><label>书名</label><input id="newTitle" placeholder="请输入书名" /></div>
+      <div><label>作者</label><input id="newAuthor" placeholder="默认使用当前作者名称" /></div>
+    </div>
+    <div class="form-grid" style="margin-top:14px">
+      <div><label>类型</label><select id="newType"><option value="玄幻">玄幻</option><option value="都市">都市</option><option value="历史">历史</option><option value="科幻">科幻</option><option value="悬疑">悬疑</option><option value="现实">现实</option><option value="其他">其他</option></select></div>
+      <div><label>标签</label><input id="newTags" placeholder="多个标签用逗号分隔，如：成长,权谋,校园" /></div>
+    </div>
+    <div style="margin-top:14px"><label>简介 / 备注</label><textarea id="newDesc" placeholder="可选：小说简介、创作说明..."></textarea></div>
+    <div class="row" style="justify-content:flex-end;margin-top:14px"><button onclick="closeModal('bookModal')">取消</button><button class="primary" onclick="createBook()">创建</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/**********************
+ * 1. 基础配置
+ **********************/
+const API_BASE = "https://7fp039tr9rtgx.cfc-execute.gz.baidubce.com/xiaoshuo1"; // 百度云函数公网地址
+const STORAGE_KEY = "zhuqing_v4_session";
+const HISTORY_KEY = "zhuqing_v4_reading_history";
+
+let books = [];
+let myBooks = [];
+let currentBook = null;
+let currentChapterIndex = 0;
+let currentUser = null; // { role:'author'|'reader', name, id, token }
+
+document.getElementById("apiStatus").textContent = API_BASE.includes("你的百度云函数") ? "请先替换 API_BASE" : API_BASE;
+
+/**********************
+ * 2. 登录页切换
+ **********************/
+document.querySelectorAll("[data-auth-tab]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll("[data-auth-tab]").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".auth-form").forEach(f=>f.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.authTab).classList.add("active");
+  });
+});
+
+/**********************
+ * 3. 通用API请求
+ **********************/
+async function api(action, payload={}, method="POST"){
+  if(API_BASE.includes("你的百度云函数")){
+    console.warn("当前未配置真实 API_BASE，前端将使用本地演示数据。action=", action);
+    return mockApi(action, payload);
+  }
+  const token = currentUser?.token || "";
+  const headers = {"Content-Type":"application/json"};
+  if(token) headers["Authorization"] = `Bearer ${token}`;
+  const options = method === "GET" ? {headers} : {
+    method:"POST",
+    headers,
+    body:JSON.stringify({action, token, ...payload})
+  };
+  const query = new URLSearchParams({action});
+  if(token) query.set("token", token);
+  const url = method === "GET" ? `${API_BASE}?${query.toString()}` : API_BASE;
+  const res = await fetch(url, options);
+  let json;
+  try{ json = await res.json(); }catch(_){ throw new Error("后端未返回合法JSON"); }
+  if(json.code !== 0) throw new Error(json.message || "接口调用失败");
+  return json.data;
+}
+
+/**********************
+ * 4. 登录 / 注册
+ **********************/
+async function loginAuthor(){
+  const authorName = document.getElementById("authorName").value.trim();
+  const inviteCode = document.getElementById("inviteCode").value.trim();
+  if(!authorName || !inviteCode) return toast("请填写作者名称和邀请码");
+  try{
+    const data = await api("authorLogin", {authorName, inviteCode});
+    currentUser = normalizeUser(data, "author", authorName);
+    enterApp();
+    toast("作者登录成功");
+  }catch(e){ toast(e.message); }
+}
+
+async function loginReader(){
+  const username = document.getElementById("readerLoginName").value.trim();
+  const password = document.getElementById("readerLoginPassword").value;
+  if(!username || !password) return toast("请输入账号和密码");
+  try{
+    const data = await api("readerLogin", {username, password});
+    currentUser = normalizeUser(data, "reader", username);
+    enterApp();
+    toast("读者登录成功");
+  }catch(e){ toast(e.message); }
+}
+
+async function registerReader(){
+  const username = document.getElementById("readerRegName").value.trim();
+  const password = document.getElementById("readerRegPassword").value;
+  const password2 = document.getElementById("readerRegPassword2").value;
+  if(!username || !password) return toast("请输入昵称和密码");
+  if(password.length < 6) return toast("密码至少6位");
+  if(password !== password2) return toast("两次密码不一致");
+  try{
+    const data = await api("readerRegister", {username, password});
+    currentUser = normalizeUser(data, "reader", username);
+    enterApp();
+    toast("注册成功，已登录");
+  }catch(e){ toast(e.message); }
+}
+
+function normalizeUser(data, role, fallbackName){
+  return {
+    role: data?.role || role,
+    id: data?.id || data?.authorId || data?.readerId || `${role}_${Date.now()}`,
+    name: data?.name || data?.authorName || data?.username || fallbackName,
+    token: data?.token || data?.authorToken || data?.readerToken || `demo_${role}_${Date.now()}`
+  };
+}
+
+function enterApp(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
+  document.getElementById("authScreen").classList.add("hidden");
+  document.getElementById("appShell").classList.remove("hidden");
+  renderUser();
+  renderNav();
+  showView(currentUser.role === "author" ? "dashboard" : "books");
+  refreshAll();
+}
+
+function logout(){
+  currentUser = null;
+  localStorage.removeItem(STORAGE_KEY);
+  books = []; myBooks = []; currentBook = null;
+  document.getElementById("appShell").classList.add("hidden");
+  document.getElementById("authScreen").classList.remove("hidden");
+  toast("已退出登录");
+}
+
+function restoreSession(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ currentUser = JSON.parse(raw); enterApp(); }
+  }catch(_){ localStorage.removeItem(STORAGE_KEY); }
+}
+
+function renderUser(){
+  document.getElementById("userNameText").textContent = currentUser?.name || "未登录";
+  document.getElementById("roleText").textContent = "身份：" + (currentUser?.role === "author" ? "作者" : "读者");
+  document.getElementById("tokenText").textContent = "Token：" + maskToken(currentUser?.token || "-");
+  document.querySelectorAll(".author-only").forEach(el=>el.classList.toggle("hidden", currentUser?.role !== "author"));
+}
+
+function maskToken(token){
+  if(!token || token === "-") return "-";
+  return token.length > 14 ? token.slice(0,8) + "..." + token.slice(-4) : token;
+}
+
+/**********************
+ * 5. 导航与视图
+ **********************/
+function renderNav(){
+  const nav = document.getElementById("navButtons");
+  const common = [{id:"dashboard", label:"🏠 总览看板"},{id:"books", label:"📚 小说书库"}];
+  const author = [{id:"authorWorks", label:"🧑‍💻 我的作品"},{id:"upload", label:"📤 上传/新增"}];
+  const reader = [{id:"readerHome", label:"📌 我的阅读"}];
+  const tail = [{id:"settings", label:"⚙️ API配置说明"}];
+  const items = currentUser?.role === "author" ? [...common, ...author, ...tail] : [...common, ...reader, ...tail];
+  nav.innerHTML = items.map((n,i)=>`<button class="${i===0?'active':''}" data-view="${n.id}">${n.label}</button>`).join("");
+  nav.querySelectorAll("button").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      nav.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      showView(btn.dataset.view);
+    });
+  });
+}
+
+function showView(id){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  const target = document.getElementById(id);
+  if(target) target.classList.add("active");
+  const nameMap = {dashboard:"总览看板",books:"小说书库",authorWorks:"我的作品",readerHome:"我的阅读",upload:"上传/新增",settings:"API配置说明",readerView:"阅读器",chapterView:"小说目录"};
+  document.getElementById("pageTitle").textContent = nameMap[id] || "竹青书斋";
+  document.querySelectorAll("#navButtons button").forEach(b=>b.classList.toggle("active", b.dataset.view === id));
+  if(id === "readerHome") renderReadingHistory();
+}
+
+/**********************
+ * 6. 数据同步与渲染
+ **********************/
+async function refreshAll(){
+  try{
+    toast("正在同步云端...");
+    books = await api("listPublicBooks", {}, "GET");
+    if(currentUser?.role === "author") myBooks = await api("listMyBooks", {}, "GET");
+    else myBooks = [];
+    renderAll();
+    toast("同步完成");
+  }catch(e){ console.error(e); toast(e.message); }
+}
+
+function renderAll(){
+  renderUser(); renderStats(); renderBooks(); renderRecent(); renderBookSelect(); renderMyBooks(); renderFilters(); renderReadingHistory();
+}
+
+function renderStats(){
+  const source = currentUser?.role === "author" && myBooks.length ? myBooks : books;
+  document.getElementById("statBooksLabel").textContent = currentUser?.role === "author" ? "我的作品/云端小说" : "云端小说";
+  document.getElementById("statBooks").textContent = source.length;
+  const chapters = source.reduce((s,b)=>s+(Number(b.chapterCount)||Number(b.chapters?.length)||0),0);
+  const words = source.reduce((s,b)=>s+(Number(b.wordCount)||0),0);
+  document.getElementById("statChapters").textContent = chapters;
+  document.getElementById("statWords").textContent = words > 10000 ? Math.round(words/10000)+"万" : words;
+  const latest = source[0]?.updatedAt ? new Date(source[0].updatedAt).toLocaleDateString() : "-";
+  document.getElementById("statUpdated").textContent = latest;
+}
+
+function bookCard(b, options={}){
+  const type = b.type || b.category || "未分类";
+  const tags = Array.isArray(b.tags) ? b.tags.join("、") : (b.tags || "");
+  const cover = b.coverUrl || b.cover || "";
+  const coverHtml = cover ? `<img src="${escapeAttr(cover)}" alt="封面"/>` : "📕";
+  const manageBadge = options.manage ? `<span class="badge warn">作者管理</span>` : "";
+  return `<div class="book" onclick="openBook('${escapeAttr(b.id)}')">
+    <div class="cover">${coverHtml}</div>
+    <h3>${escapeHtml(b.title || "未命名")}</h3>
+    <p>${escapeHtml(b.author || b.authorName || "匿名")} · ${escapeHtml(type)}</p>
+    <p>${escapeHtml((b.description || "").slice(0,48))}${(b.description||"").length>48?"...":""}</p>
+    <span class="badge">${b.chapterCount || b.chapters?.length || 0} 章 · ${b.wordCount || 0} 字</span>
+    ${tags ? `<span class="badge">${escapeHtml(tags)}</span>` : ""}
+    ${manageBadge}
+  </div>`;
+}
+
+function renderRecent(){
+  document.getElementById("recentBooks").innerHTML = books.slice(0,4).map(bookCard).join("") || `<div class="empty">暂无小说。</div>`;
+}
+
+function renderBooks(){
+  const q = (document.getElementById("searchInput")?.value || "").trim().toLowerCase();
+  const author = document.getElementById("authorFilter")?.value || "";
+  const type = document.getElementById("typeFilter")?.value || "";
+  const sort = document.getElementById("sortSelect")?.value || "updatedAt";
+  let list = books.filter(b => {
+    const hay = [b.title,b.author,b.authorName,b.type,b.category,b.tags,b.description].flat().join(" ").toLowerCase();
+    const a = b.author || b.authorName || "匿名";
+    const t = b.type || b.category || "未分类";
+    return (!q || hay.includes(q)) && (!author || a === author) && (!type || t === type);
+  });
+  list.sort((a,b)=>compareBooks(a,b,sort));
+  document.getElementById("bookGrid").innerHTML = list.map(bookCard).join("") || `<div class="empty">没有匹配的小说。</div>`;
+}
+
+function renderMyBooks(){
+  const box = document.getElementById("myBookGrid");
+  if(!box) return;
+  box.innerHTML = myBooks.map(b=>bookCard(b,{manage:true})).join("") || `<div class="empty">你还没有创建小说。点击右上角“创建小说”开始。</div>`;
+}
+
+function compareBooks(a,b,sort){
+  if(sort === "title") return (a.title||"").localeCompare(b.title||"");
+  if(sort === "author") return (a.author||a.authorName||"").localeCompare(b.author||b.authorName||"");
+  if(sort === "type") return (a.type||a.category||"").localeCompare(b.type||b.category||"");
+  return (Number(b[sort])||0) - (Number(a[sort])||0);
+}
+
+function renderFilters(){
+  const authors = [...new Set(books.map(b=>b.author||b.authorName||"匿名"))].filter(Boolean).sort();
+  const types = [...new Set(books.map(b=>b.type||b.category||"未分类"))].filter(Boolean).sort();
+  const authorSel = document.getElementById("authorFilter");
+  const typeSel = document.getElementById("typeFilter");
+  const keepAuthor = authorSel.value, keepType = typeSel.value;
+  authorSel.innerHTML = `<option value="">全部作者</option>` + authors.map(a=>`<option value="${escapeAttr(a)}">${escapeHtml(a)}</option>`).join("");
+  typeSel.innerHTML = `<option value="">全部类型</option>` + types.map(t=>`<option value="${escapeAttr(t)}">${escapeHtml(t)}</option>`).join("");
+  authorSel.value = keepAuthor; typeSel.value = keepType;
+}
+
+function clearFilters(){
+  document.getElementById("searchInput").value = "";
+  document.getElementById("authorFilter").value = "";
+  document.getElementById("typeFilter").value = "";
+  renderBooks();
+}
+
+function renderBookSelect(){
+  const sel = document.getElementById("chapterBookSelect");
+  if(!sel) return;
+  const list = currentUser?.role === "author" ? myBooks : books;
+  sel.innerHTML = list.map(b=>`<option value="${escapeAttr(b.id)}">${escapeHtml(b.title)}</option>`).join("");
+}
+
+/**********************
+ * 7. 作者功能
+ **********************/
+async function createBook(){
+  if(currentUser?.role !== "author") return toast("只有作者可以创建小说");
+  const title = document.getElementById("newTitle").value.trim();
+  const author = document.getElementById("newAuthor").value.trim() || currentUser.name;
+  const type = document.getElementById("newType").value;
+  const tags = document.getElementById("newTags").value.split(/[，,]/).map(s=>s.trim()).filter(Boolean);
+  const description = document.getElementById("newDesc").value.trim();
+  if(!title) return toast("请输入书名");
+  try{
+    await api("createBook",{title,author,type,tags,description});
+    closeModal("bookModal");
+    ["newTitle","newAuthor","newTags","newDesc"].forEach(id=>document.getElementById(id).value="");
+    await refreshAll();
+    toast("小说创建成功");
+  }catch(e){toast(e.message)}
+}
+
+async function addChapter(){
+  if(currentUser?.role !== "author") return toast("只有作者可以上传章节");
+  const bookId = document.getElementById("chapterBookSelect").value;
+  const chapterName = document.getElementById("chapterName").value.trim();
+  const content = document.getElementById("chapterContent").value.trim();
+  if(!bookId || !chapterName || !content) return toast("请选择小说并填写章节名称和正文");
+  try{
+    await api("addChapter",{bookId,chapterName,content});
+    clearChapterForm();
+    await refreshAll();
+    toast("章节保存成功");
+  }catch(e){toast(e.message)}
+}
+
+function clearChapterForm(){
+  document.getElementById("chapterName").value="";
+  document.getElementById("chapterContent").value="";
+}
+
+function prepareAddChapterForCurrent(){
+  if(currentUser?.role !== "author") return toast("只有作者可以新增章节");
+  if(currentBook){ document.getElementById("chapterBookSelect").value = currentBook.id; showView("upload"); }
+}
+
+/**********************
+ * 8. 目录与阅读器
+ **********************/
+async function openBook(bookId){
+  try{
+    currentBook = await api("getBook",{bookId});
+    document.getElementById("chapterBookTitle").textContent = (currentBook.title || "未命名") + " · 目录";
+    const type = currentBook.type || currentBook.category || "未分类";
+    document.getElementById("chapterBookMeta").textContent = `${currentBook.author || currentBook.authorName || "匿名"} · ${type} · ${currentBook.chapters?.length || 0}章`;
+    renderChapters();
+    showView("chapterView");
+  }catch(e){toast(e.message)}
+}
+
+function renderChapters(){
+  const list = currentBook?.chapters || [];
+  document.getElementById("chapterList").innerHTML = list.map((c,i)=>`
+    <div class="chapter" onclick="openChapter(${i})">
+      <div><b>${escapeHtml(c.name || c.chapterName || "未命名章节")}</b><div class="muted">${(c.content||"").length || c.wordCount || 0} 字</div></div>
+      <span class="muted">阅读 →</span>
+    </div>`).join("") || `<div class="panel muted">这本小说还没有章节。</div>`;
+}
+
+function openChapter(index){
+  currentChapterIndex = index;
+  const ch = currentBook.chapters[index];
+  document.getElementById("readerChapterTitle").textContent = ch.name || ch.chapterName || "未命名章节";
+  document.getElementById("readerBody").innerHTML = (ch.content||"").split(/\n\s*\n/).filter(Boolean).map(p=>`<p>${escapeHtml(p).replace(/\n/g,"<br>")}</p>`).join("");
+  document.getElementById("summaryOutput").textContent = "点击按钮后生成。";
+  document.getElementById("analysisOutput").textContent = "点击按钮后生成。";
+  addLocalHistory(currentBook, index);
+  showView("readerView");
+}
+
+function prevChapter(){ if(currentBook && currentChapterIndex>0) openChapter(currentChapterIndex-1); }
+function nextChapter(){ if(currentBook && currentChapterIndex<currentBook.chapters.length-1) openChapter(currentChapterIndex+1); }
+function backToChapters(){ showView("chapterView"); }
+function toggleReaderTheme(){ document.getElementById("readerBox").classList.toggle("dark"); }
+function setFontSize(v){ document.getElementById("readerBody").style.fontSize = v + "px"; }
+
+async function aiSummarize(){
+  if(!currentBook) return;
+  const ch = currentBook.chapters[currentChapterIndex];
+  document.getElementById("summaryOutput").textContent = "AI正在生成...";
+  try{
+    const data = await api("aiSummarizeChapter",{bookId:currentBook.id,chapterIndex:currentChapterIndex,content:ch.content,chapterName:ch.name || ch.chapterName});
+    document.getElementById("summaryOutput").textContent = data.result || "未返回内容";
+  }catch(e){document.getElementById("summaryOutput").textContent = e.message}
+}
+
+async function aiAnalyze(){
+  if(!currentBook) return;
+  const ch = currentBook.chapters[currentChapterIndex];
+  document.getElementById("analysisOutput").textContent = "AI正在分析...";
+  try{
+    const data = await api("aiAnalyzeChapter",{bookId:currentBook.id,chapterIndex:currentChapterIndex,content:ch.content,chapterName:ch.name || ch.chapterName});
+    document.getElementById("analysisOutput").textContent = data.result || "未返回内容";
+  }catch(e){document.getElementById("analysisOutput").textContent = e.message}
+}
+
+async function saveProgress(){
+  if(!currentBook) return;
+  try{
+    await api("saveProgress",{bookId:currentBook.id,chapterIndex:currentChapterIndex,scrollTop:document.getElementById("readerBody").scrollTop});
+    addLocalHistory(currentBook, currentChapterIndex);
+    toast("阅读进度已保存");
+  }catch(e){toast(e.message)}
+}
+
+/**********************
+ * 9. 阅读历史
+ **********************/
+function addLocalHistory(book, chapterIndex){
+  const ch = book.chapters?.[chapterIndex] || {};
+  const item = {bookId:book.id,title:book.title,author:book.author||book.authorName,chapterIndex,chapterName:ch.name||ch.chapterName||"未命名章节",time:Date.now()};
+  let list = [];
+  try{ list = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); }catch(_){ }
+  list = [item, ...list.filter(x=>!(x.bookId===item.bookId && x.chapterIndex===item.chapterIndex))].slice(0,12);
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(list));
+}
+
+function renderReadingHistory(){
+  const box = document.getElementById("readingHistory"); if(!box) return;
+  let list = [];
+  try{ list = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); }catch(_){ }
+  box.innerHTML = list.map(x=>`<div class="book" onclick="openHistory('${escapeAttr(x.bookId)}',${Number(x.chapterIndex)||0})"><div class="cover">📖</div><h3>${escapeHtml(x.title)}</h3><p>${escapeHtml(x.author||"匿名")}</p><span class="badge">${escapeHtml(x.chapterName)}</span><span class="badge">${new Date(x.time).toLocaleString()}</span></div>`).join("") || `<div class="empty">暂无阅读记录。</div>`;
+}
+
+async function openHistory(bookId, chapterIndex){
+  await openBook(bookId);
+  if(currentBook?.chapters?.[chapterIndex]) openChapter(chapterIndex);
+}
+
+/**********************
+ * 10. 弹窗与工具
+ **********************/
+function toast(msg){
+  const el = document.getElementById("toast"); el.textContent = msg; el.classList.add("show"); setTimeout(()=>el.classList.remove("show"),2200);
+}
+function openModal(id){
+  if(id === "bookModal" && currentUser?.role === "author") document.getElementById("newAuthor").value = currentUser.name;
+  document.getElementById(id).classList.add("show");
+}
+function closeModal(id){document.getElementById(id).classList.remove("show")}
+function escapeHtml(str){ return String(str ?? "").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[s])); }
+function escapeAttr(str){ return escapeHtml(str).replace(/`/g,"&#96;"); }
+
+/**********************
+ * 11. 本地演示数据：未配置API时可直接预览
+ * 实际部署时由百度云函数返回真实数据
+ **********************/
+const demoBooks = [
+  {id:"book_demo_001",title:"竹影春秋",author:"鄢清华",authorId:"author_demo",type:"历史",tags:["权谋","成长"],description:"一部以竹林书院为背景的历史成长小说。",chapterCount:2,wordCount:1680,createdAt:Date.now()-86400000*6,updatedAt:Date.now()-3600000,chapters:[{name:"第一章 竹影",content:"夜色落在竹青书斋的屋檐上，风从山口吹来，像有人翻动一册旧书。\n\n少年推门而入，看见案头的灯还亮着。先生没有抬头，只问：你可知道，真正的路从来不是别人指出来的？"},{name:"第二章 春秋",content:"第二日清晨，山下传来急报。城中旧案重启，许多人的名字重新浮出水面。\n\n少年第一次明白，书斋之外的世界，比纸上的春秋更复杂。"}]},
+  {id:"book_demo_002",title:"星港来信",author:"林舟",authorId:"author_002",type:"科幻",tags:["星际","悬疑"],description:"来自远方星港的一封信，改变了城市的命运。",chapterCount:1,wordCount:930,createdAt:Date.now()-86400000*8,updatedAt:Date.now()-86400000*2,chapters:[{name:"第一章 信号",content:"凌晨三点，城市上空出现了一段无法解释的脉冲信号。\n\n所有屏幕同时亮起，只显示一句话：请在日出之前回答。"}]},
+  {id:"book_demo_003",title:"南岸灯火",author:"江雨",authorId:"author_003",type:"现实",tags:["职场","城市"],description:"一个HR团队在数字化转型中的探索故事。",chapterCount:1,wordCount:820,createdAt:Date.now()-86400000*10,updatedAt:Date.now()-86400000*3,chapters:[{name:"第一章 看板",content:"会议室里的投影亮起，一张人才盘点看板出现在众人眼前。\n\n原本沉默的HR经理忽然说：如果这个系统能跑起来，我们就不只是做流程的人了。"}]}
+];
+
+async function mockApi(action, payload){
+  await new Promise(r=>setTimeout(r,180));
+  if(action === "authorLogin"){
+    if(!payload.inviteCode || payload.inviteCode.length < 3) throw new Error("演示模式：邀请码至少3位");
+    return {role:"author", id:"author_demo", name:payload.authorName, token:"demo_author_token_123456"};
+  }
+  if(action === "readerLogin") return {role:"reader", id:"reader_demo", name:payload.username, token:"demo_reader_token_123456"};
+  if(action === "readerRegister") return {role:"reader", id:"reader_demo", name:payload.username, token:"demo_reader_token_123456"};
+  if(action === "listPublicBooks") return JSON.parse(localStorage.getItem("zhuqing_demo_books") || JSON.stringify(demoBooks));
+  if(action === "listMyBooks"){
+    const all = JSON.parse(localStorage.getItem("zhuqing_demo_books") || JSON.stringify(demoBooks));
+    return all.filter(b=>b.authorId === "author_demo" || b.author === currentUser?.name);
+  }
+  if(action === "createBook"){
+    const all = JSON.parse(localStorage.getItem("zhuqing_demo_books") || JSON.stringify(demoBooks));
+    all.unshift({id:"book_"+Date.now(),title:payload.title,author:payload.author,authorId:"author_demo",type:payload.type,tags:payload.tags||[],description:payload.description||"",chapterCount:0,wordCount:0,createdAt:Date.now(),updatedAt:Date.now(),chapters:[]});
+    localStorage.setItem("zhuqing_demo_books", JSON.stringify(all));
+    return {ok:true};
+  }
+  if(action === "addChapter"){
+    const all = JSON.parse(localStorage.getItem("zhuqing_demo_books") || JSON.stringify(demoBooks));
+    const b = all.find(x=>x.id===payload.bookId); if(!b) throw new Error("未找到小说");
+    b.chapters = b.chapters || []; b.chapters.push({name:payload.chapterName, content:payload.content});
+    b.chapterCount = b.chapters.length; b.wordCount = b.chapters.reduce((s,c)=>s+(c.content||"").length,0); b.updatedAt = Date.now();
+    localStorage.setItem("zhuqing_demo_books", JSON.stringify(all)); return {ok:true};
+  }
+  if(action === "getBook"){
+    const all = JSON.parse(localStorage.getItem("zhuqing_demo_books") || JSON.stringify(demoBooks));
+    const b = all.find(x=>x.id===payload.bookId); if(!b) throw new Error("未找到小说"); return b;
+  }
+  if(action === "saveProgress") return {ok:true};
+  if(action === "aiSummarizeChapter") return {result:`【演示摘要】本章《${payload.chapterName}》主要推动了故事情节，呈现人物处境与关键冲突。真实部署后，这里由云函数调用 DeepSeek API 返回。`};
+  if(action === "aiAnalyzeChapter") return {result:"【演示分析】人物：主角、先生/管理者。线索：书斋、旧案、信号或组织变化。情绪：悬念、成长、转折。"};
+  throw new Error("未知操作 action=" + action);
+}
+
+restoreSession();
+</script>
+</body>
+</html>
