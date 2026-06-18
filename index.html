@@ -414,11 +414,12 @@ async function registerReader(){
 }
 
 function normalizeUser(data, role, fallbackName){
+  const user = data?.user || data || {};
   return {
-    role: data?.role || role,
-    id: data?.id || data?.authorId || data?.readerId || `${role}_${Date.now()}`,
-    name: data?.name || data?.authorName || data?.username || fallbackName,
-    token: data?.token || data?.authorToken || data?.readerToken || `demo_${role}_${Date.now()}`
+    role: user.role || data?.role || role,
+    id: user.id || data?.id || data?.authorId || data?.readerId || `${role}_${Date.now()}`,
+    name: user.name || data?.name || data?.authorName || data?.username || fallbackName,
+    token: data?.token || user.token || data?.authorToken || data?.readerToken || `demo_${role}_${Date.now()}`
   };
 }
 
@@ -494,14 +495,29 @@ function showView(id){
  * 6. 数据同步与渲染
  **********************/
 async function refreshAll(){
+  toast("正在刷新书库...");
+  const errors = [];
   try{
-    toast("正在刷新书库...");
     books = await api("listPublicBooks", {}, "GET");
-    if(currentUser?.role === "author") myBooks = await api("listMyBooks", {}, "GET");
-    else myBooks = [];
-    renderAll();
-    toast("书库已更新");
-  }catch(e){ console.error(e); toast(e.message); }
+  }catch(e){
+    console.warn("公开书库刷新失败：", e);
+    errors.push("公开书库：" + e.message);
+    books = Array.isArray(books) ? books : [];
+  }
+  if(currentUser?.role === "author"){
+    try{
+      myBooks = await api("listMyBooks", {}, "GET");
+    }catch(e){
+      console.warn("我的作品刷新失败：", e);
+      errors.push("我的作品：" + e.message);
+      myBooks = Array.isArray(myBooks) ? myBooks : [];
+    }
+  }else{
+    myBooks = [];
+  }
+  renderAll();
+  if(errors.length) toast(errors[0]);
+  else toast("书库已更新");
 }
 
 function renderAll(){
@@ -606,9 +622,14 @@ async function createBook(){
   const description = document.getElementById("newDesc").value.trim();
   if(!title) return toast("请输入书名");
   try{
-    await api("createBook",{title,author,type,tags,description});
+    const created = await api("createBook",{title,author,type,tags,description});
     closeModal("bookModal");
     ["newTitle","newAuthor","newTags","newDesc"].forEach(id=>document.getElementById(id).value="");
+    if(created && created.id){
+      myBooks = [created, ...myBooks.filter(b=>b.id !== created.id)];
+      books = [created, ...books.filter(b=>b.id !== created.id)];
+      renderAll();
+    }
     await refreshAll();
     toast("小说创建成功");
   }catch(e){toast(e.message)}
